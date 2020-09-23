@@ -44,6 +44,10 @@ app.get('/', (req, res) => {
 });
 
 app.get('/compose', (req, res) => {
+  res.render('compose');
+});
+
+app.post('/compose', (req, res) => {
   const kebab = _.kebabCase(req.body.postTitle);
 
   const { title, intro, content } = req.body;

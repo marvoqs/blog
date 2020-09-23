@@ -1,0 +1,23 @@
+<%- include("partials/header"); %>
+<h1>Nový článek</h1>
+<form action="/compose" method="post">
+  <div class="form-group">
+    <label for="titleInput">Nadpis</label>
+    <input type="text" class="form-control" id="titleInput" name="title" autocomplete="off">
+  </div>
+  <div class="form-group">
+    <label for="introInput">Úvodní text</label>
+    <textarea class="form-control" id="introInput" name="intro" rows="3"></textarea>
+  </div>
+  <div class="form-group">
+    <label for="contentInput">Text</label>
+    <textarea class="form-control" id="contentInput" name="content" rows="12"></textarea>
+  </div>
+  <div class="form-group">
+    <label for="labelsInput">Značky</label>
+    <textarea class="form-control" id="labelsInput" name="labels" rows="3"></textarea>
+    <small id="labelsHelp" class="form-text text-muted">Jednotlivé značky od sebe prosím odděl čárkami.</small>
+  </div>
+  <button type="submit" class="btn btn-primary">Vložit článek</button>
+</form>
+<%- include("partials/footer"); %>
