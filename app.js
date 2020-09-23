@@ -29,7 +29,7 @@ const Post = mongoose.model('Post', postSchema);
 app.set('view engine', 'ejs');
 
 app.use(express.static('public'));
-app.use(express.json({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
   Post.find((err, foundPosts) => {
@@ -48,15 +48,18 @@ app.get('/compose', (req, res) => {
 });
 
 app.post('/compose', (req, res) => {
-  const kebab = _.kebabCase(req.body.postTitle);
+  const { title, intro, content, labels } = req.body;
 
-  const { title, intro, content } = req.body;
+  const kebab = _.kebabCase(title);
+
+  const labelsArray = labels.split(',').map((label) => label.trim());
 
   const post = new Post({
     kebab,
     title,
     intro,
     content,
+    labels: labelsArray,
   });
 
   post.save((err) => {
