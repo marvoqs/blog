@@ -1,0 +1,10 @@
+.social-media-icon {
+  text-decoration: none;
+  margin: 0 5px;
+  font-size: 1.5rem;
+}
+
+.social-media-icon:hover {
+  text-decoration: none;
+  color: #ccc !important;
+}

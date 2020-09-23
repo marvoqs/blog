@@ -2,14 +2,29 @@ require('dotenv').config();
 const express = require('express');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
+const _ = require('lodash');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 mongoose.connect(
-  `mongodb+srv://${MONGODB_USER}:${MONGODB_PASSWORD}@cluster0.t7utl.mongodb.net/blog?retryWrites=true&w=majority`,
-  { useNewUrlParser: true }
+  `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@cluster0.t7utl.mongodb.net/blog?retryWrites=true&w=majority`,
+  { useNewUrlParser: true, useUnifiedTopology: true }
 );
+
+const postSchema = {
+  kebab: String,
+  title: String,
+  intro: String,
+  content: String,
+  date: {
+    type: Date,
+    default: Date.now(),
+  },
+  labels: [],
+};
+
+const Post = mongoose.model('Post', postSchema);
 
 app.set('view engine', 'ejs');
 
@@ -17,7 +32,34 @@ app.use(express.static('public'));
 app.use(express.json({ extended: true }));
 
 app.get('/', (req, res) => {
-  res.render('home');
+  Post.find((err, foundPosts) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.render('home', {
+        posts: foundPosts,
+      });
+    }
+  });
+});
+
+app.get('/compose', (req, res) => {
+  const kebab = _.kebabCase(req.body.postTitle);
+
+  const { title, intro, content } = req.body;
+
+  const post = new Post({
+    kebab,
+    title,
+    intro,
+    content,
+  });
+
+  post.save((err) => {
+    if (!err) {
+      res.redirect('/');
+    }
+  });
 });
 
 app.listen(port, () => {
