@@ -4,45 +4,18 @@ const ejs = require('ejs');
 const mongoose = require('mongoose');
 const _ = require('lodash');
 const dateFormat = require('dateformat');
+const Post = require('./posts');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 mongoose.connect(
-  `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@cluster0.t7utl.mongodb.net/blog?retryWrites=true&w=majority`,
-  {
+  `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@cluster0.t7utl.mongodb.net/blog?retryWrites=true&w=majority`, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
   }
 );
-
-const postSchema = {
-  kebab: {
-    type: String,
-    required: true,
-  },
-  title: {
-    type: String,
-    required: true,
-  },
-  intro: {
-    type: String,
-    required: true,
-  },
-  content: String,
-  date: {
-    type: Date,
-    default: Date.now(),
-  },
-  labels: [],
-  views: {
-    type: Number,
-    default: 0,
-  },
-};
-
-const Post = mongoose.model('Post', postSchema);
 
 app.set('view engine', 'ejs');
 
@@ -55,13 +28,13 @@ app.use(
 
 dateFormat.i18n = {
   dayNames: [
-    'neděle',
-    'pondělí',
-    'úterý',
-    'středa',
-    'čtvrtek',
-    'pátek',
-    'sobota',
+    'ne',
+    'po',
+    'út',
+    'st',
+    'čt',
+    'pá',
+    'so',
     'neděle',
     'pondělí',
     'úterý',
@@ -99,11 +72,16 @@ dateFormat.i18n = {
   timeNames: ['a', 'p', 'am', 'pm', 'A', 'P', 'AM', 'PM'],
 };
 
+const postLimit = 5;
+
 app.get('/', async (req, res) => {
   try {
-    const posts = await Post.find().sort({
-      date: -1,
-    });
+    const posts = await Post.find()
+      .sort({
+        date: -1,
+      })
+      .limit(postLimit);
+
     posts.map(
       (post) => (post.dateHumanized = dateFormat(post.date, 'd. m. yyyy H:MM'))
     );
@@ -116,16 +94,57 @@ app.get('/', async (req, res) => {
   }
 });
 
+app.get('/posts', async (req, res) => {
+  const page = parseInt(req.query.page);
+
+  const startIndex = (page - 1) * postLimit;
+  const endIndex = page * postLimit;
+
+  const content = {};
+
+  if (endIndex < await Post.countDocuments().exec()) {
+    content.next = page + 1;
+  }
+
+  if (startIndex > 0) {
+    content.previous = page - 1;
+  }
+
+  try {
+    const posts = await Post.find()
+      .sort({
+        date: -1,
+      })
+      .skip(startIndex)
+      .limit(postLimit)
+      .exec();
+    posts.map(
+      (post) => (post.dateHumanized = dateFormat(post.date, 'd. m. yyyy H:MM'))
+    );
+
+    content.posts = posts;
+    console.log('next', content.next);
+    console.log('previous', content.previous);
+    res.render('home', content);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error.');
+  }
+
+
+});
+
 app.get('/posts/:id/:kebab', async (req, res) => {
   try {
     // look for post and update views
-    const post = await Post.findOneAndUpdate(
-      {
-        _id: req.params.id,
-        kebab: req.params.kebab,
-      },
-      { $inc: { views: 1 } }
-    );
+    const post = await Post.findOneAndUpdate({
+      _id: req.params.id,
+      kebab: req.params.kebab,
+    }, {
+      $inc: {
+        views: 1
+      }
+    });
 
     // check if post exists
     if (post) {
@@ -151,7 +170,12 @@ app.get('/compose', async (req, res) => {
 });
 
 app.post('/compose', async (req, res) => {
-  const { title, intro, content, labels } = req.body;
+  const {
+    title,
+    intro,
+    content,
+    labels
+  } = req.body;
 
   let kebab = _.kebabCase(title);
 
@@ -163,6 +187,7 @@ app.post('/compose', async (req, res) => {
     intro,
     content,
     labels: labelsArray,
+    date: Date.now(),
   });
 
   post.save((err) => {
