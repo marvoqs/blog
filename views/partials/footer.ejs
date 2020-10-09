@@ -16,19 +16,21 @@
     </div>
   </div>
   <div class="card mt-3">
-    <div class="card-header bg-light">Nejčtenější příspěvky</div>
+    <div class="card-header bg-light">Poslední příspěvky</div>
     <div class="card-body">
-      <h5 class="card-title">Light card title</h5>
-      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
-        content.</p>
+      <% newPosts.map((post) => { %>
+      <a href="/posts/<%= post.id %>/<%= post.kebab %>" class="card-title"><%= post.title %></a>
+      <p class="card-text"><%= post.dateHumanized %></p>
+      <% }); %>
     </div>
   </div>
   <div class="card mt-3">
-    <div class="card-header bg-light">Poslední příspěvky</div>
+    <div class="card-header bg-light">Nejčtenější příspěvky</div>
     <div class="card-body">
-      <h5 class="card-title">Light card title</h5>
-      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
-        content.</p>
+      <% popularPosts.map((post) => { %>
+      <a href="/posts/<%= post.id %>/<%= post.kebab %>" class="card-title"><%= post.title %></a>
+      <p class="card-text"><%= post.dateHumanized %></p>
+      <% }); %>
     </div>
   </div>
 
