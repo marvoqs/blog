@@ -3,7 +3,7 @@ const express = require('express');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
 const _ = require('lodash');
-const dateFormat = require('dateformat');
+const czdate = require('./czdate');
 const Post = require('./posts');
 
 const app = express();
@@ -26,52 +26,6 @@ app.use(
     extended: true,
   })
 );
-
-dateFormat.i18n = {
-  dayNames: [
-    'ne',
-    'po',
-    'út',
-    'st',
-    'čt',
-    'pá',
-    'so',
-    'neděle',
-    'pondělí',
-    'úterý',
-    'středa',
-    'čtvrtek',
-    'pátek',
-    'sobota',
-  ],
-  monthNames: [
-    'ledna',
-    'února',
-    'března',
-    'dubna',
-    'května',
-    'června',
-    'července',
-    'srpna',
-    'září',
-    'října',
-    'listopadu',
-    'prosince',
-    'ledna',
-    'února',
-    'března',
-    'dubna',
-    'května',
-    'června',
-    'července',
-    'srpna',
-    'září',
-    'října',
-    'listopadu',
-    'prosince',
-  ],
-  timeNames: ['a', 'p', 'am', 'pm', 'A', 'P', 'AM', 'PM'],
-};
 
 const postLimit = 10;
 
@@ -121,7 +75,7 @@ app.get('/', async (req, res) => {
       .limit(postLimit);
 
     posts.map(
-      (post) => (post.dateHumanized = dateFormat(post.date, 'd. m. yyyy H:MM'))
+      (post) => (post.dateHumanized = czdate(post.date, 'd. m. yyyy H:MM'))
     );
 
     const content = await composeContent({
@@ -154,7 +108,7 @@ app.get('/posts/:id/:kebab', async (req, res) => {
     // check if post exists
     if (post) {
       // create a new field with humanized date
-      post.dateHumanized = dateFormat(post.date, 'dddd d. mmmm yyyy H:MM');
+      post.dateHumanized = czdate(post.date, 'dddd d. mmmm yyyy H:MM');
 
       //render page with post
       res.render('post', await composeContent({post}));
@@ -216,7 +170,7 @@ async function getNewPosts() {
     .limit(5);
 
   newPosts.map(
-    (post) => (post.dateHumanized = dateFormat(post.date, 'd. m. yyyy H:MM'))
+    (post) => (post.dateHumanized = czdate(post.date, 'd. m. yyyy H:MM'))
   );
 
   return newPosts;
@@ -230,7 +184,7 @@ async function getPopularPosts() {
     .limit(5);
 
   popularPosts.map(
-    (post) => (post.dateHumanized = dateFormat(post.date, 'd. m. yyyy H:MM'))
+    (post) => (post.dateHumanized = czdate(post.date, 'd. m. yyyy H:MM'))
   );
 
   return popularPosts;
