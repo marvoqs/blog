@@ -1,0 +1,29 @@
+<%- include("partials/header"); %>
+<% if (message) { %>
+<div class="alert alert-secondary" role="alert">
+  <%= message %>
+</div>
+<% } %>
+<% posts.map((post) => { %>
+<h3><%= post.title %></h3>
+<p class="text-muted"><%= post.dateHumanized %></p>
+<p><%= post.intro %></p>
+<p><a href="/posts/<%= post.id %>/<%= post.kebab %>">Číst více</a></p>
+<hr />
+<% }); %>
+<div class="d-flex justify-content-between mb-3">
+  <div>
+    <% if (typeof(navigation.previous) !== "undefined") { %>
+    <a href="/?q=<%= query %>&page=<%= navigation.previous %>" class="btn btn-dark" role="button"
+      aria-pressed="true">Previous</a>
+    <% } %>
+  </div>
+  <div>
+    <% if (typeof(navigation.next) !== "undefined") { %>
+    <a href="/?q=<%= query %>&page=<%= navigation.next %>" class="btn btn-dark" role="button"
+      aria-pressed="true">Next</a>
+    <% } %>
+  </div>
+</div>
+
+<%- include("partials/footer"); %>

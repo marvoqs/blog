@@ -10,11 +10,11 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 mongoose.connect(
-  `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@cluster0.t7utl.mongodb.net/blog?retryWrites=true&w=majority`,
-  {
+  `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@cluster0.t7utl.mongodb.net/blog?retryWrites=true&w=majority`, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
+    useCreateIndex: true
   }
 );
 
@@ -75,66 +75,69 @@ dateFormat.i18n = {
 
 const postLimit = 10;
 
-app.get('/', (req, res) => {
-  res.redirect('/posts');
-});
-
-app.get('/posts', async (req, res) => {
-  const page = req.query.page === undefined ? 1 : parseInt(req.query.page);
-
-  const startIndex = (page - 1) * postLimit;
-  const endIndex = page * postLimit;
-
-  const navigation = {};
-
-  if (endIndex < (await Post.countDocuments().exec())) {
-    navigation.next = page + 1;
-  }
-
-  if (startIndex > 0) {
-    navigation.previous = page - 1;
-  }
+app.get('/', async (req, res) => {
 
   try {
-    const posts = await Post.find()
+    const isSearching = () => (req.query.q !== undefined && req.query.q !== '');
+    
+    const dbQuery = isSearching() ? { $text: { $search: req.query.q } } : {};
+
+    const numOfArticles = await Post.countDocuments(dbQuery);
+
+    const message = isSearching() && `Nalezli jsme ${numOfArticles} článků, které odpovídají vašemu zadání.`;
+
+    // pagination
+    const page = req.query.page === undefined ? 1 : parseInt(req.query.page);
+    const startIndex = (page - 1) * postLimit;
+    const endIndex = page * postLimit;
+    const navigation = {};
+    if (endIndex < (numOfArticles)) {
+      navigation.next = page + 1;
+    }
+    if (startIndex > 0) {
+      navigation.previous = page - 1;
+    }
+
+    Post.createIndexes();
+    const posts = await Post.find(dbQuery)
       .sort({
         date: -1,
       })
       .skip(startIndex)
-      .limit(postLimit)
-      .exec();
+      .limit(postLimit);
+
     posts.map(
       (post) => (post.dateHumanized = dateFormat(post.date, 'd. m. yyyy H:MM'))
     );
 
     const content = {
+      query: req.query.q,
+      message,
+      posts,
+      navigation,
       newPosts: await getNewPosts(),
       popularPosts: await getPopularPosts(),
-      posts,
-      page,
     };
 
-    res.render('home', content);
+    res.render('posts', content);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error.');
   }
+
 });
 
 app.get('/posts/:id/:kebab', async (req, res) => {
   try {
     // look for post and update views
-    const post = await Post.findOneAndUpdate(
-      {
-        _id: req.params.id,
-        kebab: req.params.kebab,
+    const post = await Post.findOneAndUpdate({
+      _id: req.params.id,
+      kebab: req.params.kebab,
+    }, {
+      $inc: {
+        views: 1,
       },
-      {
-        $inc: {
-          views: 1,
-        },
-      }
-    );
+    });
 
     // check if post exists
     if (post) {
@@ -159,25 +162,31 @@ app.get('/posts/:id/:kebab', async (req, res) => {
   }
 });
 
-app.get('/compose', (req, res) => {
+app.get('/compose', async (req, res) => {
   res.render('compose', {
-    newPosts: getNewPosts(),
+    newPosts: await getNewPosts(),
+    popularPosts: await getPopularPosts(),
   });
 });
 
-app.post('/compose', (req, res) => {
-  const { title, intro, content, labels } = req.body;
+app.post('/compose', async (req, res) => {
+  const {
+    title,
+    intro,
+    content,
+    tags
+  } = req.body;
 
   let kebab = _.kebabCase(title);
 
-  const labelsArray = labels.split(',').map((label) => label.trim());
+  const tagsArray = tags.split(',').map((tag) => tag.trim());
 
   const post = new Post({
     kebab,
     title,
     intro,
     content,
-    labels: labelsArray,
+    tags: tagsArray,
     date: Date.now(),
   });
 

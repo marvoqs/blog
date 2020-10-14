@@ -18,11 +18,15 @@ const postSchema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
-  labels: [],
+  tags: [],
   views: {
     type: Number,
     default: 0,
   },
+});
+
+postSchema.index({
+  '$**': 'text'
 });
 
 module.exports = mongoose.model('Post', postSchema);
