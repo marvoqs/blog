@@ -12,3 +12,12 @@
 .img-profile {
   width: 60%;
 }
+
+.link-heading {
+  color: inherit;
+}
+
+.link-heading:hover {
+  color: inherit;
+  text-decoration: none;
+}

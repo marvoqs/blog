@@ -77,6 +77,19 @@ const postLimit = 10;
 
 app.get('/', async (req, res) => {
 
+  function composeMessage(numOfArticles) {
+    // compose message based on number of found articles
+    if (numOfArticles === 0) {
+      return 'Nebyl nalezen žádný článek odpovídající vašemu zadání.';
+    } else if (numOfArticles === 1) {
+      return 'Nalezli jsme 1 článek, který odpovídá vašemu zadání.';
+    } else if (numOfArticles > 1 && numOfArticles < 5) {
+      return `Nalezli jsme ${numOfArticles} články, které odpovídají vašemu zadání.`;
+    } else {
+      return `Nalezli jsme ${numOfArticles} článků, které odpovídají vašemu zadání.`;
+    }
+  }
+
   try {
     const isSearching = () => (req.query.q !== undefined && req.query.q !== '');
     
@@ -84,7 +97,8 @@ app.get('/', async (req, res) => {
 
     const numOfArticles = await Post.countDocuments(dbQuery);
 
-    const message = isSearching() && `Nalezli jsme ${numOfArticles} článků, které odpovídají vašemu zadání.`;
+    // if user is searching, compose a message based on number of found articles
+    const message = isSearching() && composeMessage(numOfArticles);
 
     // pagination
     const page = req.query.page === undefined ? 1 : parseInt(req.query.page);
@@ -110,14 +124,12 @@ app.get('/', async (req, res) => {
       (post) => (post.dateHumanized = dateFormat(post.date, 'd. m. yyyy H:MM'))
     );
 
-    const content = {
+    const content = await composeContent({
       query: req.query.q,
       message,
       posts,
-      navigation,
-      newPosts: await getNewPosts(),
-      popularPosts: await getPopularPosts(),
-    };
+      navigation
+    });
 
     res.render('posts', content);
   } catch (err) {
@@ -144,14 +156,8 @@ app.get('/posts/:id/:kebab', async (req, res) => {
       // create a new field with humanized date
       post.dateHumanized = dateFormat(post.date, 'dddd d. mmmm yyyy H:MM');
 
-      const content = {
-        newPosts: await getNewPosts(),
-        popularPosts: await getPopularPosts(),
-        post,
-      };
-
       //render page with post
-      res.render('post', content);
+      res.render('post', await composeContent({post}));
     } else {
       // redirect home with 404
       res.status(404).redirect('/');
@@ -163,10 +169,7 @@ app.get('/posts/:id/:kebab', async (req, res) => {
 });
 
 app.get('/compose', async (req, res) => {
-  res.render('compose', {
-    newPosts: await getNewPosts(),
-    popularPosts: await getPopularPosts(),
-  });
+  res.render('compose', await composeContent());
 });
 
 app.post('/compose', async (req, res) => {
@@ -196,6 +199,14 @@ app.post('/compose', async (req, res) => {
     }
   });
 });
+
+async function composeContent(content) {
+  return {
+    ...content,
+    newPosts: await getNewPosts(),
+    popularPosts: await getPopularPosts(),
+  };
+}
 
 async function getNewPosts() {
   const newPosts = await Post.find()

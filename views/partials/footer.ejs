@@ -21,7 +21,7 @@
     <div class="card-body">
       <% newPosts.map((post) => { %>
       <a href="/posts/<%= post.id %>/<%= post.kebab %>" class="card-title"><%= post.title %></a>
-      <p class="card-text"><%= post.dateHumanized %></p>
+      <p class="card-text"><small class="text-muted"><%= post.dateHumanized %></small></p>
       <% }); %>
     </div>
   </div>
@@ -30,7 +30,7 @@
     <div class="card-body">
       <% popularPosts.map((post) => { %>
       <a href="/posts/<%= post.id %>/<%= post.kebab %>" class="card-title"><%= post.title %></a>
-      <p class="card-text"><%= post.dateHumanized %></p>
+      <p class="card-text"><small class="text-muted"><%= post.dateHumanized %></small></p>
       <% }); %>
     </div>
   </div>
