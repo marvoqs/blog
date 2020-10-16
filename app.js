@@ -6,8 +6,6 @@ const postRouter = require('./routes/posts');
 const userRouter = require('./routes/users');
 const session = require('express-session');
 const passport = require('passport');
-const _ = require('lodash');
-
 
 const composeContent = require('./composeContent')
 const czdate = require('./czdate');

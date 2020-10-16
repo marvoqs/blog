@@ -53,14 +53,14 @@ router.get('/', async (req, res) => {
     // get posts for this page
     const posts = await Post.find(dbQuery)
       .sort({
-        date: -1,
+        createdAt: -1,
       })
       .skip(startIndex)
       .limit(postLimit);
 
     // go throw the posts and humanize its dates
     posts.map(
-      (post) => (post.dateHumanized = czdate(post.date, 'd. m. yyyy H:MM'))
+      (post) => (post.dateHumanized = czdate(post.createdAt, 'd. m. yyyy H:MM'))
     );
 
     // compose content
@@ -79,13 +79,23 @@ router.get('/', async (req, res) => {
 
 });
 
-router.get('/:id/:kebab', async (req, res) => {
+router.get('/new', async (req, res) => {
+  if (req.isAuthenticated()) {
+    res.render('posts/new', await composeContent());
+  } else {
+    res.redirect('/users/login');
+  }
+});
+
+router.post('/', async (req, res, next) => {
+  req.post = new Post();
+  next();
+}, savePostAndRedirect('new'));
+
+router.get('/:slug', async (req, res) => {
   try {
     // look for post and update views
-    const post = await Post.findOneAndUpdate({
-      _id: req.params.id,
-      kebab: req.params.kebab,
-    }, {
+    const post = await Post.findOneAndUpdate({ slug: req.params.slug }, {
       $inc: {
         views: 1,
       },
@@ -94,7 +104,7 @@ router.get('/:id/:kebab', async (req, res) => {
     // check if post exists
     if (post) {
       // create a new field with humanized date
-      post.dateHumanized = czdate(post.date, 'dddd d. mmmm yyyy H:MM');
+      post.dateHumanized = czdate(post.createdAt, 'dddd d. mmmm yyyy H:MM');
 
       //render page with post
       res.render('posts/show', await composeContent({post}));
@@ -108,40 +118,21 @@ router.get('/:id/:kebab', async (req, res) => {
   }
 });
 
-router.get('/new', async (req, res) => {
-  if (req.isAuthenticated()) {
-    res.render('posts/new', await composeContent());
-  } else {
-    res.redirect('/users/login');
-  }
-});
-
-router.post('/new', async (req, res) => {
-  const {
-    title,
-    intro,
-    content,
-    tags
-  } = req.body;
-
-  let kebab = _.kebabCase(title);
-
-  const tagsArray = tags.split(',').map((tag) => tag.trim());
-
-  const post = new Post({
-    kebab,
-    title,
-    intro,
-    content,
-    tags: tagsArray,
-    date: Date.now(),
-  });
-
-  post.save((err) => {
-    if (!err) {
-      res.redirect('/');
+function savePostAndRedirect(path) {
+  return async (req, res) => {
+    let post = req.post;
+    post.title = req.body.title;
+    post.intro = req.body.intro; 
+    post.markdown = req.body.markdown;
+    post.tags = req.body.tags.split(',').map((tag) => tag.trim());
+    try {
+      post = await post.save();
+      res.redirect(`/posts/${post.slug}`);
+    } catch (e) {
+      console.log(e);
+      res.render(`posts/${path}`, { post });
     }
-  });
-});
+  }
+}
 
 module.exports = router;
