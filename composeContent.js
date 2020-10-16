@@ -12,12 +12,12 @@ async function composeContent(content = {}) {
 async function getNewPosts() {
   const newPosts = await Post.find()
     .sort({
-      date: -1,
+      createdAt: -1,
     })
     .limit(5);
 
   newPosts.map(
-    (post) => (post.dateHumanized = czdate(post.date, 'd. m. yyyy H:MM'))
+    (post) => (post.dateHumanized = czdate(post.createdAt, 'd. m. yyyy H:MM'))
   );
 
   return newPosts;
@@ -31,7 +31,7 @@ async function getPopularPosts() {
     .limit(5);
 
   popularPosts.map(
-    (post) => (post.dateHumanized = czdate(post.date, 'd. m. yyyy H:MM'))
+    (post) => (post.dateHumanized = czdate(post.createdAt, 'd. m. yyyy H:MM'))
   );
 
   return popularPosts;

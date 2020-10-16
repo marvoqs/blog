@@ -1,9 +1,17 @@
 <%- include("./../partials/header"); %>
-<h2><%= post.title %></h2>
+<div class="d-flex justify-content-between">
+  <div><h2><%= post.title %></h2></div>
+  <div>
+    <a href="/posts/edit/<%= post.id %>" class="btn btn-info">Upravit</a>
+    <form action="/posts/<%= post.id %>?_method=DELETE" method="post" class="d-inline">
+      <button type="submit" class="btn btn-danger">Smazat</button>
+    </form>
+  </div>
+</div>
 <p class="text-muted"><%= post.dateHumanized %></p>
 <p><%= post.intro %></p>
 <div><%- post.sanitizedHtml %></div>
-<a href="/posts/edit/<%= post.id %>" class="btn btn-info">Edit</a>
+
 
 
 <a href="#" onclick="window.history.back()">Vrátit se zpět</a>

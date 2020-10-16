@@ -8,9 +8,6 @@ const session = require('express-session');
 const passport = require('passport');
 const methodOverride = require('method-override');
 
-const composeContent = require('./composeContent')
-const czdate = require('./config/czdate');
-
 const Post = require('./models/post');
 const User = require('./models/user');
 
@@ -27,20 +24,17 @@ app.use(
   })
 );
 app.use(methodOverride('_method'));
-
 app.use(session({
   secret: process.env.SECRET,
   resave: false,
   saveUninitialized: false
 }));
-
 app.use(passport.initialize());
 app.use(passport.session());
 
 connectDB();
 
 passport.use(User.createStrategy());
-
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 

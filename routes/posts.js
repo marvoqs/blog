@@ -99,6 +99,11 @@ router.put('/:id', auth, async (req, res, next) => {
   next();
 }, savePostAndRedirect('new'));
 
+router.delete('/:id', auth, async (req, res) => {
+  await Post.findByIdAndDelete(req.params.id);
+  res.redirect('/');
+});
+
 router.get('/:slug', async (req, res) => {
   try {
     // look for post and update views
