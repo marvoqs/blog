@@ -1,8 +1,8 @@
-<%- include("partials/header"); %>
-<h2>Přihlášení</h2>
+<%- include("./../partials/header"); %>
+<h2>Registrace</h2>
 
 <!-- Makes POST request to /login route -->
-<form action="/login" method="POST">
+<form action="/users/register" method="POST">
   <div class="form-group">
     <label for="email">Email</label>
     <input type="email" class="form-control" name="username">
@@ -11,8 +11,8 @@
     <label for="password">Heslo</label>
     <input type="password" class="form-control" name="password">
   </div>
-  <button type="submit" class="btn btn-dark">Přihlásit</button>
+  <button type="submit" class="btn btn-dark">Registrovat</button>
 </form>
 
 
-<%- include("partials/footer"); %>
+<%- include("./../partials/footer"); %>

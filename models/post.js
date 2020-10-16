@@ -16,7 +16,7 @@ const postSchema = new mongoose.Schema({
   content: String,
   date: {
     type: Date,
-    default: Date.now(),
+    default: Date.now,
   },
   tags: [],
   views: {

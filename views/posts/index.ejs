@@ -1,4 +1,4 @@
-<%- include("partials/header"); %>
+<%- include("./../partials/header"); %>
 <% posts.map((post) => { %>
 <h3><a href="/posts/<%= post.id %>/<%= post.kebab %>" class="link-heading"><%= post.title %></a></h3>
 <p class="text-muted"><%= post.dateHumanized %></p>
@@ -9,16 +9,16 @@
 <div class="d-flex justify-content-between mb-3">
   <div>
     <% if (typeof(navigation.previous) !== "undefined") { %>
-    <a href="/?q=<%= query %>&page=<%= navigation.previous %>" class="btn btn-dark" role="button"
+    <a href="/posts/?q=<%= query %>&page=<%= navigation.previous %>" class="btn btn-dark" role="button"
       aria-pressed="true">Previous</a>
     <% } %>
   </div>
   <div>
     <% if (typeof(navigation.next) !== "undefined") { %>
-    <a href="/?q=<%= query %>&page=<%= navigation.next %>" class="btn btn-dark" role="button"
+    <a href="/posts/?q=<%= query %>&page=<%= navigation.next %>" class="btn btn-dark" role="button"
       aria-pressed="true">Next</a>
     <% } %>
   </div>
 </div>
 
-<%- include("partials/footer"); %>
+<%- include("./../partials/footer"); %>

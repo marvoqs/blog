@@ -1,6 +1,6 @@
-<%- include("partials/header"); %>
+<%- include("./../partials/header"); %>
 <h1>Nový článek</h1>
-<form action="/compose" method="post">
+<form action="/posts/new" method="post">
   <div class="form-group">
     <label for="titleInput">Nadpis</label>
     <input type="text" class="form-control" id="titleInput" name="title" autocomplete="off">
@@ -20,6 +20,6 @@
   </div>
   <button type="submit" class="btn btn-primary">Vložit článek</button>
 </form>
-<a href="/logout" class="btn btn-dark mt-3" role="button"
+<a href="/users/logout" class="btn btn-dark mt-3" role="button"
   aria-pressed="true">Odhlásit</a>
-<%- include("partials/footer"); %>
+<%- include("./../partials/footer"); %>
