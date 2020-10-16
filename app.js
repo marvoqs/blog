@@ -3,20 +3,19 @@ const express = require('express');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
 const _ = require('lodash');
+const session = require('express-session');
+const passport = require('passport');
+const passportLocalMongoose = require('passport-local-mongoose');
+
 const czdate = require('./czdate');
-const Post = require('./posts');
+
+const Post = require('./models/post');
+const User = require('./models/user');
 
 const app = express();
-const port = process.env.PORT || 3000;
 
-mongoose.connect(
-  `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@cluster0.t7utl.mongodb.net/blog?retryWrites=true&w=majority`, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
-    useCreateIndex: true
-  }
-);
+const port = process.env.PORT || 3000;
+const postLimit = 10;
 
 app.set('view engine', 'ejs');
 
@@ -27,7 +26,28 @@ app.use(
   })
 );
 
-const postLimit = 10;
+app.use(session({
+  secret: process.env.SECRET,
+  resave: false,
+  saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(User.createStrategy());
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+mongoose.connect(
+  `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@cluster0.t7utl.mongodb.net/blog?retryWrites=true&w=majority`, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true
+  }
+);
 
 app.get('/', async (req, res) => {
 
@@ -45,10 +65,14 @@ app.get('/', async (req, res) => {
   }
 
   try {
+
+    // user-is-searching checker
     const isSearching = () => (req.query.q !== undefined && req.query.q !== '');
-    
+
+    // create db query
     const dbQuery = isSearching() ? { $text: { $search: req.query.q } } : {};
 
+    // get number of all the found articles
     const numOfArticles = await Post.countDocuments(dbQuery);
 
     // if user is searching, compose a message based on number of found articles
@@ -67,6 +91,8 @@ app.get('/', async (req, res) => {
     }
 
     Post.createIndexes();
+
+    // get posts for this page
     const posts = await Post.find(dbQuery)
       .sort({
         date: -1,
@@ -74,10 +100,12 @@ app.get('/', async (req, res) => {
       .skip(startIndex)
       .limit(postLimit);
 
+    // go throw the posts and humanize its dates
     posts.map(
       (post) => (post.dateHumanized = czdate(post.date, 'd. m. yyyy H:MM'))
     );
 
+    // compose content
     const content = await composeContent({
       query: req.query.q,
       message,
@@ -122,8 +150,62 @@ app.get('/posts/:id/:kebab', async (req, res) => {
   }
 });
 
+app.get('/register', async (req, res) => {
+  res.render('register', await composeContent());
+});
+
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+
+  // register using passport
+  User.register({username}, password, async (err, user) => {
+    if (err) {
+      console.error(err.message);
+      res.render('register', await composeContent({message: err.message}));
+    } else {
+      passport.authenticate('local')(req, res, () => {
+        res.redirect('/compose');
+      });
+    }
+    
+  });
+
+});
+
+app.get('/login', async (req, res) => {
+  res.render('login', await composeContent());
+});
+
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  const user = new User({ username, password });
+
+  req.login(user, async (err) => {
+    if (err) {
+      console.error(err.message);
+      res.render('login', await composeContent({message: err.message}));
+    } else {
+      passport.authenticate('local')(req, res, () => {
+        res.redirect('/compose');
+      });
+    }
+  })
+
+});
+
+app.get('/logout', async (req, res) => {
+  req.logout();
+  res.redirect('/');
+});
+
 app.get('/compose', async (req, res) => {
-  res.render('compose', await composeContent());
+  if (req.isAuthenticated()) {
+    res.render('compose', await composeContent());
+  } else {
+    res.redirect('/login');
+  }
+  
 });
 
 app.post('/compose', async (req, res) => {
@@ -154,7 +236,7 @@ app.post('/compose', async (req, res) => {
   });
 });
 
-async function composeContent(content) {
+async function composeContent(content = {}) {
   return {
     ...content,
     newPosts: await getNewPosts(),

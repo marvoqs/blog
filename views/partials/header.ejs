@@ -40,3 +40,8 @@
   <div class="container">
     <div class="row">
       <div class="col-lg-9 mt-3">
+        <% if (typeof message !== "undefined" && message) { %>
+        <div class="alert alert-secondary" role="alert">
+          <%= message %>
+        </div>
+        <% } %>
