@@ -6,6 +6,7 @@ const postRouter = require('./routes/posts');
 const userRouter = require('./routes/users');
 const session = require('express-session');
 const passport = require('passport');
+const methodOverride = require('method-override');
 
 const composeContent = require('./composeContent')
 const czdate = require('./czdate');
@@ -26,6 +27,7 @@ app.use(
     extended: true,
   })
 );
+app.use(methodOverride('_method'));
 
 app.use(session({
   secret: process.env.SECRET,

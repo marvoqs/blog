@@ -1,8 +1,8 @@
 <%- include("./../partials/header"); %>
 <h1>Nový článek</h1>
-<form action="/posts/new" method="post">
+<form action="/posts/<%= post.id %>?_method=PUT" method="post">
   <%- include('_form_fields') %>
-  <button type="submit" class="btn btn-primary">Vložit článek</button>
+  <button type="submit" class="btn btn-primary">Uložit změny</button>
 </form>
 <a href="/users/logout" class="btn btn-dark mt-3" role="button"
   aria-pressed="true">Odhlásit</a>

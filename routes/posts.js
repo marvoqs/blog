@@ -1,4 +1,5 @@
 const express = require('express');
+const auth = require("./../middleware/auth");
 const Post = require('./../models/post');
 const router = express.Router();
 
@@ -79,16 +80,22 @@ router.get('/', async (req, res) => {
 
 });
 
-router.get('/new', async (req, res) => {
-  if (req.isAuthenticated()) {
-    res.render('posts/new', await composeContent());
-  } else {
-    res.redirect('/users/login');
-  }
+router.get('/new', auth, async (req, res) => {
+  res.render('posts/new', await composeContent({ post: new Post() }));
 });
 
-router.post('/', async (req, res, next) => {
+router.get('/edit/:id', auth, async (req, res) => {
+  post = await Post.findById(req.params.id);
+  res.render('posts/edit', await composeContent({ post }));
+});
+
+router.post('/', auth, async (req, res, next) => {
   req.post = new Post();
+  next();
+}, savePostAndRedirect('new'));
+
+router.put('/:id', auth, async (req, res, next) => {
+  req.post = await Post.findById(req.params.id);
   next();
 }, savePostAndRedirect('new'));
 

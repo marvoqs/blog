@@ -1,0 +1,17 @@
+<div class="form-group">
+  <label for="titleInput">Nadpis</label>
+  <input type="text" class="form-control" id="titleInput" name="title" autocomplete="off" value="<%= post.title %>" required>
+</div>
+<div class="form-group">
+  <label for="introInput">Úvodní text</label>
+  <textarea class="form-control" id="introInput" name="intro" rows="3" required><%= post.intro %></textarea>
+</div>
+<div class="form-group">
+  <label for="markdownInput">Text</label>
+  <textarea class="form-control" id="markdownInput" name="markdown" rows="12" required><%= post.markdown %></textarea>
+</div>
+<div class="form-group">
+  <label for="tagsInput">Značky</label>
+  <textarea class="form-control" id="tagsInput" name="tags" rows="3"><%= post.tags.join(', ') %></textarea>
+  <small id="tagsHelp" class="form-text text-muted">Jednotlivé značky od sebe prosím odděl čárkami.</small>
+</div>
