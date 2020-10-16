@@ -3,7 +3,7 @@ const auth = require("./../middleware/auth");
 const Post = require('./../models/post');
 const router = express.Router();
 
-const czdate = require('./../czdate');
+const czdate = require('../config/czdate');
 const composeContent = require('./../composeContent')
 
 const postLimit = 10;

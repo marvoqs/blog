@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const ejs = require('ejs');
-const mongoose = require('mongoose');
+const connectDB = require("./config/db");
 const postRouter = require('./routes/posts');
 const userRouter = require('./routes/users');
 const session = require('express-session');
@@ -9,7 +9,7 @@ const passport = require('passport');
 const methodOverride = require('method-override');
 
 const composeContent = require('./composeContent')
-const czdate = require('./czdate');
+const czdate = require('./config/czdate');
 
 const Post = require('./models/post');
 const User = require('./models/user');
@@ -17,7 +17,6 @@ const User = require('./models/user');
 const app = express();
 
 const port = process.env.PORT || 3000;
-
 
 app.set('view engine', 'ejs');
 
@@ -38,19 +37,12 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+connectDB();
+
 passport.use(User.createStrategy());
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
-
-mongoose.connect(
-  `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@cluster0.t7utl.mongodb.net/blog?retryWrites=true&w=majority`, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
-    useCreateIndex: true
-  }
-);
 
 app.get('/', (req, res) => {
   res.redirect('/posts');

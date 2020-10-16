@@ -1,5 +1,5 @@
 const Post = require('./models/post');
-const czdate = require('./czdate');
+const czdate = require('./config/czdate');
 
 async function composeContent(content = {}) {
   return {
