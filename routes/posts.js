@@ -4,7 +4,6 @@ const Post = require('./../models/post');
 const router = express.Router();
 
 const czdate = require('../config/czdate');
-const composeContent = require('./../composeContent')
 
 const postLimit = 10;
 
@@ -62,11 +61,12 @@ router.get('/', async (req, res) => {
     );
 
     // compose content
-    const content = await composeContent({
+    const content = {
+      ...req.content,
       query: req.query.q,
       posts,
       navigation
-    });
+    };
 
     // if user is searching, compose and flash a message based on number of found articles
     if (isSearching()) {
@@ -82,12 +82,12 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/new', auth, async (req, res) => {
-  res.render('posts/new', await composeContent({ post: new Post() }));
+  res.render('posts/new', { ...req.content, post: new Post() });
 });
 
 router.get('/edit/:id', auth, async (req, res) => {
   post = await Post.findById(req.params.id);
-  res.render('posts/edit', await composeContent({ post }));
+  res.render('posts/edit', { ...req.content, post });
 });
 
 router.post('/', auth, async (req, res, next) => {
@@ -123,7 +123,7 @@ router.get('/:slug', async (req, res) => {
       post.dateHumanized = czdate(post.createdAt, 'dddd d. mmmm yyyy H:MM');
 
       //render page with post
-      res.render('posts/show', await composeContent({post}));
+      res.render('posts/show', {...req.content, post});
     } else {
       // redirect home with 404
       res.status(404).redirect('/');

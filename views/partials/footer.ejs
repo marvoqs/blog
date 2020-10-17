@@ -18,7 +18,7 @@
     <div class="card-header bg-light">Poslední příspěvky</div>
     <div class="card-body">
       <% newPosts.map((post) => { %>
-      <a href="/posts/<%= post.id %>/<%= post.kebab %>" class="card-title"><%= post.title %></a>
+      <a href="/posts/<%= post.slug %>" class="card-title"><%= post.title %></a>
       <p class="card-text"><small class="text-muted"><%= post.dateHumanized %></small></p>
       <% }); %>
     </div>
@@ -27,7 +27,7 @@
     <div class="card-header bg-light">Nejčtenější příspěvky</div>
     <div class="card-body">
       <% popularPosts.map((post) => { %>
-      <a href="/posts/<%= post.id %>/<%= post.kebab %>" class="card-title"><%= post.title %></a>
+      <a href="/posts/<%= post.slug %>" class="card-title"><%= post.title %></a>
       <p class="card-text"><small class="text-muted"><%= post.dateHumanized %></small></p>
       <% }); %>
     </div>

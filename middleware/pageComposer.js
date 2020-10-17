@@ -1,12 +1,12 @@
-const Post = require('./models/post');
-const czdate = require('./config/czdate');
+const Post = require('../models/post');
+const czdate = require('../config/czdate');
 
-async function composeContent(content = {}) {
-  return {
-    ...content,
+async function composeContent(req, res, next) {
+  req.content = {
     newPosts: await getNewPosts(),
     popularPosts: await getPopularPosts(),
   };
+  next()
 }
 
 async function getNewPosts() {

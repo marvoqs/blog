@@ -3,11 +3,10 @@ const User = require('./../models/user');
 const router = express.Router();
 const passport = require('passport');
 const passportLocalMongoose = require('passport-local-mongoose');
-const composeContent = require('./../composeContent');
 const { eq } = require('lodash');
 
 router.get('/register', async (req, res) => {
-  res.render('users/register', await composeContent());
+  res.render('users/register', {...req.content});
 });
 
 router.post('/register', async (req, res) => {
@@ -17,7 +16,7 @@ router.post('/register', async (req, res) => {
   User.register({username}, password, async (err, user) => {
     if (err) {
       console.error(err.message);
-      res.render('users/register', await composeContent({message: err.message}));
+      res.render('users/register', {...req.content});
     } else {
       passport.authenticate('local')(req, res, () => {
         res.redirect('/posts/new');
@@ -29,7 +28,7 @@ router.post('/register', async (req, res) => {
 });
 
 router.get('/login', async (req, res) => {
-  res.render('users/login', await composeContent());
+  res.render('users/login', {...req.content});
 });
 
 router.post('/login', passport.authenticate('local', { 

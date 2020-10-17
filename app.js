@@ -8,6 +8,7 @@ const ejs = require('ejs');
 const connectDB = require("./config/db");
 const postRouter = require('./routes/posts');
 const userRouter = require('./routes/users');
+const pageComposer = require('./middleware/pageComposer')
 
 const Post = require('./models/post');
 const User = require('./models/user');
@@ -24,6 +25,7 @@ app.use(
     extended: true,
   })
 );
+app.use(composeContent)
 app.use(flash());
 app.use(session({
   secret: process.env.SESSION_SECRET,
