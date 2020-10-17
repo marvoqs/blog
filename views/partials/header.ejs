@@ -27,7 +27,7 @@
   <nav class="navbar navbar-dark bg-dark">
     <div class="container">
       <a class="navbar-brand" href="/">Marek Schwarz</a>
-      <form class="form-inline" action="/" method="get">
+      <form class="form-inline" action="/posts" method="get">
         <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="q" />
         <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
           Search
@@ -40,8 +40,8 @@
   <div class="container">
     <div class="row">
       <div class="col-lg-9 mt-3">
-        <% if (typeof message !== "undefined" && message) { %>
-        <div class="alert alert-secondary" role="alert">
-          <%= message %>
-        </div>
+        <% if (messages.info) { %>
+          <div class="alert alert-secondary" role="alert">
+            <%= messages.info %>
+          </div>
         <% } %>

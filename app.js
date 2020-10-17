@@ -1,12 +1,13 @@
 require('dotenv').config();
 const express = require('express');
+const flash = require('express-flash');
+const session = require('express-session');
+const passport = require('passport');
+const methodOverride = require('method-override');
 const ejs = require('ejs');
 const connectDB = require("./config/db");
 const postRouter = require('./routes/posts');
 const userRouter = require('./routes/users');
-const session = require('express-session');
-const passport = require('passport');
-const methodOverride = require('method-override');
 
 const Post = require('./models/post');
 const User = require('./models/user');
@@ -23,14 +24,15 @@ app.use(
     extended: true,
   })
 );
-app.use(methodOverride('_method'));
+app.use(flash());
 app.use(session({
-  secret: process.env.SECRET,
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(methodOverride('_method'));
 
 connectDB();
 

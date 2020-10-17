@@ -34,9 +34,6 @@ router.get('/', async (req, res) => {
     // get number of all the found articles
     const numOfArticles = await Post.countDocuments(dbQuery);
 
-    // if user is searching, compose a message based on number of found articles
-    const message = isSearching() && composeMessage(numOfArticles);
-
     // pagination
     const page = req.query.page === undefined ? 1 : parseInt(req.query.page);
     const startIndex = (page - 1) * postLimit;
@@ -67,10 +64,14 @@ router.get('/', async (req, res) => {
     // compose content
     const content = await composeContent({
       query: req.query.q,
-      message,
       posts,
       navigation
     });
+
+    // if user is searching, compose and flash a message based on number of found articles
+    if (isSearching()) {
+      req.flash('info', composeMessage(numOfArticles));
+    } 
 
     res.render('posts/index', content);
   } catch (err) {
@@ -91,16 +92,19 @@ router.get('/edit/:id', auth, async (req, res) => {
 
 router.post('/', auth, async (req, res, next) => {
   req.post = new Post();
+  req.flash('info', 'Nový článek byl úspěšně vložen.');
   next();
 }, savePostAndRedirect('new'));
 
 router.put('/:id', auth, async (req, res, next) => {
   req.post = await Post.findById(req.params.id);
+  req.flash('info', 'Změny byly uloženy.');
   next();
 }, savePostAndRedirect('new'));
 
 router.delete('/:id', auth, async (req, res) => {
   await Post.findByIdAndDelete(req.params.id);
+  req.flash('info', 'Článek byl odstraněn.');
   res.redirect('/');
 });
 
