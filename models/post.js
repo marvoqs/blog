@@ -11,6 +11,10 @@ const postSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  authorId: {
+    type: String,
+    required: true,
+  },
   title: {
     type: String,
     required: true,

@@ -6,6 +6,7 @@ async function composeContent(req, res, next) {
     newPosts: await getNewPosts(),
     popularPosts: await getPopularPosts(),
   };
+  req.content.user = req.isAuthenticated() ? req.user : false;
   next()
 }
 

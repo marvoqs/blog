@@ -8,7 +8,7 @@ const ejs = require('ejs');
 const connectDB = require("./config/db");
 const postRouter = require('./routes/posts');
 const userRouter = require('./routes/users');
-const pageComposer = require('./middleware/pageComposer')
+const pageComposer = require('./middleware/pageComposer');
 
 const Post = require('./models/post');
 const User = require('./models/user');
@@ -25,7 +25,6 @@ app.use(
     extended: true,
   })
 );
-app.use(pageComposer);
 app.use(flash());
 app.use(session({
   secret: process.env.SESSION_SECRET,
@@ -41,6 +40,8 @@ connectDB();
 passport.use(User.createStrategy());
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+
+app.use(pageComposer);
 
 app.get('/', (req, res) => {
   res.redirect('/posts');

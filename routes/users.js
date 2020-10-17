@@ -3,7 +3,6 @@ const User = require('./../models/user');
 const router = express.Router();
 const passport = require('passport');
 const passportLocalMongoose = require('passport-local-mongoose');
-const { eq } = require('lodash');
 
 router.get('/register', async (req, res) => {
   res.render('users/register', {...req.content});
@@ -19,7 +18,8 @@ router.post('/register', async (req, res) => {
       res.render('users/register', {...req.content});
     } else {
       passport.authenticate('local')(req, res, () => {
-        res.redirect('/posts/new');
+        req.flash('success', 'Váš účet byl v pořádku vytvořen. Nyní jste přihlášen(a).');
+        res.redirect('/posts');
       });
     }
     

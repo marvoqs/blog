@@ -92,14 +92,15 @@ router.get('/edit/:id', auth, async (req, res) => {
 
 router.post('/', auth, async (req, res, next) => {
   req.post = new Post();
-  req.flash('success', 'Nový článek byl úspěšně vložen.');
+  req.post.authorId = req.user.id;
   next();
+  req.flash('success', 'Nový článek byl úspěšně vložen.');
 }, savePostAndRedirect('new'));
 
 router.put('/:id', auth, async (req, res, next) => {
   req.post = await Post.findById(req.params.id);
-  req.flash('success', 'Změny byly uloženy.');
   next();
+  req.flash('success', 'Změny byly uloženy.');
 }, savePostAndRedirect('new'));
 
 router.delete('/:id', auth, async (req, res) => {

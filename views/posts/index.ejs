@@ -1,4 +1,7 @@
 <%- include("./../partials/header"); %>
+<% if (user) { %>
+  <a href="/posts/new" class="btn btn-success float-right" role="button" aria-pressed="true">Nový článek</a>
+<% } %>
 <% posts.map((post) => { %>
 <h3><a href="/posts/<%= post.slug %>" class="link-heading"><%= post.title %></a></h3>
 <p class="text-muted"><%= post.dateHumanized %></p>
