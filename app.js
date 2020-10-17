@@ -25,7 +25,7 @@ app.use(
     extended: true,
   })
 );
-app.use(composeContent)
+app.use(pageComposer);
 app.use(flash());
 app.use(session({
   secret: process.env.SESSION_SECRET,
