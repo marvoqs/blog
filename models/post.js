@@ -24,7 +24,7 @@ const postSchema = new mongoose.Schema({
     required: true,
   },
   markdown: {
-    type: String, 
+    type: String,
     required: true,
   },
   sanitizedHtml: {
@@ -43,10 +43,10 @@ const postSchema = new mongoose.Schema({
 });
 
 postSchema.index({
-  '$**': 'text'
+  '$**': 'text',
 });
 
-postSchema.pre('validate', function(next) {
+postSchema.pre('validate', function (next) {
   if (this.title) {
     this.slug = slugify(this.title, { lower: true, strict: true });
   }
@@ -56,6 +56,6 @@ postSchema.pre('validate', function(next) {
   }
 
   next();
-})
+});
 
 module.exports = mongoose.model('Post', postSchema);

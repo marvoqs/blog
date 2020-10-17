@@ -1,22 +1,7 @@
 const dateFormat = require('dateformat');
 
 dateFormat.i18n = {
-  dayNames: [
-    'ne',
-    'po',
-    'út',
-    'st',
-    'čt',
-    'pá',
-    'so',
-    'neděle',
-    'pondělí',
-    'úterý',
-    'středa',
-    'čtvrtek',
-    'pátek',
-    'sobota',
-  ],
+  dayNames: ['ne', 'po', 'út', 'st', 'čt', 'pá', 'so', 'neděle', 'pondělí', 'úterý', 'středa', 'čtvrtek', 'pátek', 'sobota'],
   monthNames: [
     'ledna',
     'února',

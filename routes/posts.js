@@ -1,5 +1,5 @@
 const express = require('express');
-const auth = require("./../middleware/auth");
+const auth = require('./../middleware/auth');
 const Post = require('./../models/post');
 const router = express.Router();
 
@@ -8,7 +8,6 @@ const czdate = require('../config/czdate');
 const postLimit = 10;
 
 router.get('/', async (req, res) => {
-
   function composeMessage(numOfArticles) {
     // compose message based on number of found articles
     if (numOfArticles === 0) {
@@ -23,9 +22,8 @@ router.get('/', async (req, res) => {
   }
 
   try {
-
     // user-is-searching checker
-    const isSearching = () => (req.query.q !== undefined && req.query.q !== '');
+    const isSearching = () => req.query.q !== undefined && req.query.q !== '';
 
     // create db query
     const dbQuery = isSearching() ? { $text: { $search: req.query.q } } : {};
@@ -38,7 +36,7 @@ router.get('/', async (req, res) => {
     const startIndex = (page - 1) * postLimit;
     const endIndex = page * postLimit;
     const navigation = {};
-    if (endIndex < (numOfArticles)) {
+    if (endIndex < numOfArticles) {
       navigation.next = page + 1;
     }
     if (startIndex > 0) {
@@ -56,29 +54,26 @@ router.get('/', async (req, res) => {
       .limit(postLimit);
 
     // go throw the posts and humanize its dates
-    posts.map(
-      (post) => (post.dateHumanized = czdate(post.createdAt, 'd. m. yyyy H:MM'))
-    );
+    posts.map((post) => (post.dateHumanized = czdate(post.createdAt, 'd. m. yyyy H:MM')));
 
     // compose content
     const content = {
       ...req.content,
       query: req.query.q,
       posts,
-      navigation
+      navigation,
     };
 
     // if user is searching, compose and flash a message based on number of found articles
     if (isSearching()) {
       req.flash('info', composeMessage(numOfArticles));
-    } 
+    }
 
     res.render('posts/index', content);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error.');
   }
-
 });
 
 router.get('/new', auth, async (req, res) => {
@@ -90,18 +85,28 @@ router.get('/edit/:id', auth, async (req, res) => {
   res.render('posts/edit', { ...req.content, post });
 });
 
-router.post('/', auth, async (req, res, next) => {
-  req.post = new Post();
-  req.post.authorId = req.user.id;
-  next();
-  req.flash('success', 'Nový článek byl úspěšně vložen.');
-}, savePostAndRedirect('new'));
+router.post(
+  '/',
+  auth,
+  async (req, res, next) => {
+    req.post = new Post();
+    req.post.authorId = req.user.id;
+    next();
+    req.flash('success', 'Nový článek byl úspěšně vložen.');
+  },
+  savePostAndRedirect('new')
+);
 
-router.put('/:id', auth, async (req, res, next) => {
-  req.post = await Post.findById(req.params.id);
-  next();
-  req.flash('success', 'Změny byly uloženy.');
-}, savePostAndRedirect('new'));
+router.put(
+  '/:id',
+  auth,
+  async (req, res, next) => {
+    req.post = await Post.findById(req.params.id);
+    next();
+    req.flash('success', 'Změny byly uloženy.');
+  },
+  savePostAndRedirect('new')
+);
 
 router.delete('/:id', auth, async (req, res) => {
   await Post.findByIdAndDelete(req.params.id);
@@ -112,11 +117,14 @@ router.delete('/:id', auth, async (req, res) => {
 router.get('/:slug', async (req, res) => {
   try {
     // look for post and update views
-    const post = await Post.findOneAndUpdate({ slug: req.params.slug }, {
-      $inc: {
-        views: 1,
-      },
-    });
+    const post = await Post.findOneAndUpdate(
+      { slug: req.params.slug },
+      {
+        $inc: {
+          views: 1,
+        },
+      }
+    );
 
     // check if post exists
     if (post) {
@@ -124,7 +132,7 @@ router.get('/:slug', async (req, res) => {
       post.dateHumanized = czdate(post.createdAt, 'dddd d. mmmm yyyy H:MM');
 
       //render page with post
-      res.render('posts/show', {...req.content, post});
+      res.render('posts/show', { ...req.content, post });
     } else {
       // redirect home with 404
       res.status(404).redirect('/');
@@ -139,7 +147,7 @@ function savePostAndRedirect(path) {
   return async (req, res) => {
     let post = req.post;
     post.title = req.body.title;
-    post.intro = req.body.intro; 
+    post.intro = req.body.intro;
     post.markdown = req.body.markdown;
     post.tags = req.body.tags.split(',').map((tag) => tag.trim());
     try {
@@ -149,7 +157,7 @@ function savePostAndRedirect(path) {
       console.log(e);
       res.render(`posts/${path}`, { ...req.content, post });
     }
-  }
+  };
 }
 
 module.exports = router;

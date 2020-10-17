@@ -6,8 +6,8 @@ const userSchema = new mongoose.Schema({
   password: String,
   admin: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 
 userSchema.plugin(passportLocalMongoose);

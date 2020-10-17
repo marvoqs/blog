@@ -3,7 +3,7 @@
   <div><h2><%= post.title %></h2></div>
   <% if (user.id === post.authorId || user.admin) { %>
   <div>
-    <a href="/posts/edit/<%= post.id %>" class="btn btn-info">Upravit</a>
+    <a href="/posts/edit/<%= post.id %>" class="btn btn-info" role="button" aria-pressed="false">Upravit</a>
     <form action="/posts/<%= post.id %>?_method=DELETE" method="post" class="d-inline">
       <button type="submit" class="btn btn-danger">Smazat</button>
     </form>
@@ -14,9 +14,6 @@
 <p><strong><%= post.intro %></strong></p>
 <div><%- post.sanitizedHtml %></div>
 
-
-
 <a href="#" onclick="window.history.back()">Vrátit se zpět</a>
-
 
 <%- include("./../partials/footer"); %>

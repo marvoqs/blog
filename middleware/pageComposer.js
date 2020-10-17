@@ -7,7 +7,7 @@ async function composeContent(req, res, next) {
     popularPosts: await getPopularPosts(),
   };
   req.content.user = req.isAuthenticated() ? req.user : false;
-  next()
+  next();
 }
 
 async function getNewPosts() {
@@ -17,9 +17,7 @@ async function getNewPosts() {
     })
     .limit(5);
 
-  newPosts.map(
-    (post) => (post.dateHumanized = czdate(post.createdAt, 'd. m. yyyy H:MM'))
-  );
+  newPosts.map((post) => (post.dateHumanized = czdate(post.createdAt, 'd. m. yyyy H:MM')));
 
   return newPosts;
 }
@@ -31,9 +29,7 @@ async function getPopularPosts() {
     })
     .limit(5);
 
-  popularPosts.map(
-    (post) => (post.dateHumanized = czdate(post.createdAt, 'd. m. yyyy H:MM'))
-  );
+  popularPosts.map((post) => (post.dateHumanized = czdate(post.createdAt, 'd. m. yyyy H:MM')));
 
   return popularPosts;
 }

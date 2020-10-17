@@ -5,7 +5,7 @@ const session = require('express-session');
 const passport = require('passport');
 const methodOverride = require('method-override');
 const ejs = require('ejs');
-const connectDB = require("./config/db");
+const connectDB = require('./config/db');
 const postRouter = require('./routes/posts');
 const userRouter = require('./routes/users');
 const pageComposer = require('./middleware/pageComposer');
@@ -26,11 +26,13 @@ app.use(
   })
 );
 app.use(flash());
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false
-}));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(methodOverride('_method'));
@@ -45,7 +47,7 @@ app.use(pageComposer);
 
 app.get('/', (req, res) => {
   res.redirect('/posts');
-})
+});
 
 app.use('/posts', postRouter);
 app.use('/users', userRouter);
