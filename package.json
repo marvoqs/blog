@@ -2,7 +2,7 @@
   "name": "blog",
   "version": "0.1.0",
   "description": "my personal blog",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
     "start": "node server",
     "server": "nodemon server",
