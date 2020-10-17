@@ -18,7 +18,7 @@ router.post('/register', async (req, res) => {
       res.render('users/register', {...req.content});
     } else {
       passport.authenticate('local')(req, res, () => {
-        req.flash('success', 'Váš účet byl v pořádku vytvořen. Nyní jste přihlášen(a).');
+        req.flash('success', 'Váš účet byl v pořádku vytvořen. Nyní jste přihlášen/a.');
         res.redirect('/posts');
       });
     }
@@ -39,6 +39,7 @@ router.post('/login', passport.authenticate('local', {
 
 router.get('/logout', async (req, res) => {
   req.logout();
+  req.flash('success', 'Byl/a jste odhášen/a.');
   res.redirect('/');
 });
 

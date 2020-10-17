@@ -2,7 +2,7 @@
 <h1>Nový článek</h1>
 <form action="/posts/<%= post.id %>?_method=PUT" method="post">
   <%- include('_form_fields') %>
-  <button type="submit" class="btn btn-primary">Uložit změny</button>
+  <button type="submit" class="btn btn-primary mb-3">Uložit změny</button>
 </form>
 <a href="#" onclick="window.history.back()">Vrátit se zpět</a>
 <%- include("./../partials/footer"); %>
