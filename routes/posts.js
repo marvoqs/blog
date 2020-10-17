@@ -147,7 +147,7 @@ function savePostAndRedirect(path) {
       res.redirect(`/posts/${post.slug}`);
     } catch (e) {
       console.log(e);
-      res.render(`posts/${path}`, { post });
+      res.render(`posts/${path}`, { ...req.content, post });
     }
   }
 }
